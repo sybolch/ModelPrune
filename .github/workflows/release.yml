@@ -1,0 +1,74 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v[0-9]*'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  check:
+    name: Check release (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        python-version: ['3.11', '3.14']
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: python -m unittest discover -q
+      - run: python tools/make_preview.py
+      - run: python tools/check_repository.py
+      - name: Check that the committed preview is current
+        run: git diff --exit-code -- docs/preview.html
+      - name: Validate release tag and changelog
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: python tools/prepare_release.py --tag "$RELEASE_TAG" --notes-file "$RUNNER_TEMP/release-notes.md"
+
+  publish:
+    name: Publish GitHub release
+    needs: check
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+      - name: Prepare release notes
+        id: prepare
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: python tools/prepare_release.py --tag "$RELEASE_TAG" --notes-file "$RUNNER_TEMP/release-notes.md" --github-output "$GITHUB_OUTPUT"
+      - name: Publish from the existing tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+          PRERELEASE: ${{ steps.prepare.outputs.prerelease }}
+        run: |
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            echo "Release already exists; leaving it unchanged."
+            exit 0
+          fi
+          gh release create "$RELEASE_TAG" \
+            --verify-tag \
+            --title "$RELEASE_TAG" \
+            --notes-file "$RUNNER_TEMP/release-notes.md" \
+            --prerelease="$PRERELEASE"

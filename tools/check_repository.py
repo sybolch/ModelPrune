@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 def check(root=ROOT):
     required = ['README.md', 'QUICKSTART.md', 'AGENTS.md', 'LICENSE', 'CHANGELOG.md',
                 'THIRD_PARTY_NOTICES.md', 'install.sh', 'install.py', 'runtime-versions.json',
-                '.github/workflows/checks.yml', 'docs/architecture.md', 'docs/development.md',
+                '.github/workflows/checks.yml', '.github/workflows/release.yml', 'tools/prepare_release.py', 'docs/architecture.md', 'docs/development.md',
                 'docs/benchmarking.md', 'docs/previews.md', 'docs/preview.html',
                 'docs/images/report-overview.png', 'docs/images/model-comparison.png']
     for name in required:
