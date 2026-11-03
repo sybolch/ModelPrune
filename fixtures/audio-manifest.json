@@ -1,0 +1,63 @@
+{
+  "voice": "Piper en_US-ljspeech-high",
+  "task_voice": "Piper en_US-ljspeech-high (neural, relaxed pace)",
+  "voice_source": "https://huggingface.co/rhasspy/piper-voices/tree/e7229f7d33a10e145e109b886d661984201ac3c4/en/en_US/ljspeech/high",
+  "source_dataset_license": "public domain (LJ Speech, per upstream model card)",
+  "voice_model_sha256": "5d4f08ba6a2a48c44592eed3ce56bf85e9de3dd4e20df90541ae68a8310c029a",
+  "length_scale": 1.2,
+  "sentence_silence": 0.5,
+  "peak_target": 0.85,
+  "clips": [
+    {
+      "file": "audio-1.wav",
+      "transcript": "The color is purple.",
+      "sha256": "732aa3536abe84aa0204ba99404c81f09e18e017d03210b5c87c6653cb9a38b8",
+      "seconds": 2.0038548752834466,
+      "sample_rate": 22050,
+      "prompt": "What color is mentioned in the recording? Return JSON {\"color\":string}.",
+      "expected": {
+        "color": "purple"
+      }
+    },
+    {
+      "file": "audio-2.wav",
+      "transcript": "Please order seven blue mugs for Alice.",
+      "sha256": "1787091c09f06536f679c5c23d402ccf9dff0d9dff00a2b9786221584c11cb4a",
+      "seconds": 3.931111111111111,
+      "sample_rate": 22050,
+      "expected": {
+        "count": 7,
+        "color": "blue",
+        "person": "Alice"
+      }
+    },
+    {
+      "file": "audio-3.wav",
+      "transcript": "The train to Bristol departs at nine thirty. The platform has changed from number four to number six.",
+      "sha256": "6e0058a43b2d1682212a802e5ce1a3c6d0422a44a5a373d2e59ba1a3e5097338",
+      "seconds": 7.7863945578231295,
+      "sample_rate": 22050
+    }
+  ],
+  "verification": {
+    "engine": "Whisper tiny.en CPU int8, pinned local snapshot",
+    "normalization": "Case/punctuation, number spellings and departure time 930=9:30",
+    "results": [
+      {
+        "file": "audio-1.wav",
+        "transcript": "The color is purple.",
+        "matched": true
+      },
+      {
+        "file": "audio-2.wav",
+        "transcript": "Please order seven blue mugs for Alice.",
+        "matched": true
+      },
+      {
+        "file": "audio-3.wav",
+        "transcript": "The train to Bristol Departs at 930. The platform has changed from number 4 to number 6.",
+        "matched": true
+      }
+    ]
+  }
+}

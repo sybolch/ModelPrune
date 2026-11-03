@@ -1,0 +1,14 @@
+{
+  "package_version": "1.0.0",
+  "uv": "0.13.6",
+  "python_evalscope": "3.14.9",
+  "python_speech": "3.11.17",
+  "python_comfyui": "3.14.9",
+  "evalscope": "1.14.1",
+  "comfyui_revision": "f9f54cae428337ae9d9342b14141d77e1fb53ef0",
+  "comfyui_version": "0.22.0",
+  "whisper_repo": "Systran/faster-whisper-tiny.en",
+  "whisper_revision": "0d3d19a32d3338f10357c0889762bd8d64bbdeba",
+  "platform": "Linux x86_64",
+  "image_backend": "NVIDIA CUDA 13.0"
+}
