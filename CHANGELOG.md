@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Add a checked, tag-triggered GitHub release workflow with changelog-based notes.
+- Keep demo image bytes stable across CI runtimes and accept two- or three-part release tags.
 
 ## 1.0.0 — 2026-11-03
 

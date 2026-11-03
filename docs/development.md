@@ -33,7 +33,7 @@ Release versions belong in application/package metadata, Git tags and the change
 
 ## Release workflow
 
-[The release workflow](../.github/workflows/release.yml) runs when a version tag (`v*`) is pushed. It checks the tag against `runtime-versions.json`, requires matching nonempty changelog notes, runs the unit suite and repository checks on Python 3.11 and 3.14, and verifies the generated preview matches the committed file.
+[The release workflow](../.github/workflows/release.yml) runs when a two- or three-part version tag (`v1.0` or `v1.0.0`, optionally with a prerelease suffix) is pushed. It checks the tag against `runtime-versions.json`, requires matching nonempty changelog notes, runs the unit suite and repository checks on Python 3.11 and 3.14, and verifies the generated preview matches the committed file.
 
 To release:
 
@@ -47,8 +47,8 @@ git tag -a v1.0.0 -m "Release v1.0.0"
 git push origin v1.0.0
 ```
 
-Use a new tag for subsequent releases. If a local tag already exists, verify it points at the intended release commit instead of recreating it. The tagged commit must contain the release workflow.
+Use a new tag for subsequent releases. If a local tag already exists, verify it points at the intended release commit instead of recreating it. The tagged commit must contain the release workflow. Two-part tags imply patch version zero: `v1.0` validates against package/changelog version `1.0.0`, not `1.0.1`. Tag filters are GitHub glob patterns, not regular expressions.
 
-Once both check jobs pass, the publish job creates the GitHub release from that existing tag using the built-in `GITHUB_TOKEN`. No extra secret is needed. Notes come only from that version's changelog section, plus installation instructions. Tags such as `v1.1.0-rc.1` are marked as prereleases. Reruns leave an existing release untouched.
+Once both check jobs pass, the publish job creates the GitHub release from that existing tag using the built-in `GITHUB_TOKEN`. No extra secret is needed. Notes come only from that version's changelog section, plus installation instructions. Tags such as `v1.1-rc.1` and `v1.1.0-rc.1` validate against `1.1.0-rc.1` and are marked as prereleases. Reruns leave an existing release untouched.
 
 GitHub supplies the standard source-code downloads. The workflow does not upload model weights, private reports, venvs or a custom distribution archive, and it never starts inference.

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Render a deterministic synthetic demo; never reads model stores or private runs."""
+import base64
 import copy
 import hashlib
 import sys
@@ -14,6 +15,12 @@ import report_ui
 def demo_data():
     tasks = copy.deepcopy(m.suite())
     for task in tasks:
+        # PNG compression varies between zlib implementations. Reuse committed
+        # demo assets so documentation output stays byte-identical across hosts.
+        if task.get('kind') == 'vision':
+            image = (ROOT / 'docs/assets' / (task['id'] + '.png')).read_bytes()
+            task['image_b64'] = base64.b64encode(image).decode()
+            task['asset_sha256'] = hashlib.sha256(image).hexdigest()
         if task.get('category') in ('code-tracing', 'code-debugging'):
             task['skill'] = 'coding'
     core = ['completion', 'coding', 'tools', 'thinking']

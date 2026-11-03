@@ -31,8 +31,8 @@ class ReleaseTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'does not match'):
             prepare('v1.0.1', self.root)
 
-    def test_requires_complete_version_tag(self):
-        for tag in ['main', '1.0.0', 'v1.0', 'v01.0.0', 'v1.0.0-rc.01', 'v1.0.0\n']:
+    def test_requires_a_valid_version_tag(self):
+        for tag in ['main', '1.0.0', 'v1', 'v01.0.0', 'v1.0.0-rc.01', 'v1.0.0\n']:
             with self.subTest(tag=tag), self.assertRaises(ValueError):
                 prepare(tag, self.root)
 
@@ -46,3 +46,14 @@ class ReleaseTests(unittest.TestCase):
             with self.subTest(text=text), self.assertRaises(ValueError):
                 self.changelog(text)
                 prepare('v1.0.0', self.root)
+
+    def test_two_part_tag_maps_to_zero_patch_version(self):
+        self.assertEqual(prepare('v1.0', self.root), prepare('v1.0.0', self.root))
+        self.write_version('1.0.1')
+        with self.assertRaisesRegex(ValueError, 'does not match'):
+            prepare('v1.0', self.root)
+
+    def test_two_part_prerelease_keeps_its_suffix(self):
+        self.write_version('1.1.0-rc.1')
+        self.changelog('## 1.1.0-rc.1\n\n- Release candidate.\n')
+        self.assertEqual(prepare('v1.1-rc.1', self.root), prepare('v1.1.0-rc.1', self.root))

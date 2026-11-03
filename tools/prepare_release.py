@@ -6,18 +6,25 @@ from pathlib import Path
 import re
 
 ROOT = Path(__file__).resolve().parents[1]
-TAG = re.compile(r'v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?')
+TAG = re.compile(
+    r'v(?P<major>0|[1-9][0-9]*)\.(?P<minor>0|[1-9][0-9]*)'
+    r'(?:\.(?P<patch>0|[1-9][0-9]*))?'
+    r'(?:-(?P<prerelease>[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?'
+)
 
 
 def prepare(tag, root=ROOT):
     match = TAG.fullmatch(tag)
     if not match:
-        raise ValueError('Use a version tag such as v1.0.0 or v1.1.0-rc.1')
-    prerelease = match.group(4)
+        raise ValueError('Use a version tag such as v1.0, v1.0.0 or v1.1.0-rc.1')
+    prerelease = match.group('prerelease')
     if prerelease and any(part.isdigit() and len(part) > 1 and part.startswith('0') for part in prerelease.split('.')):
         raise ValueError('Numeric prerelease identifiers cannot have leading zeroes')
     version = json.loads((root / 'runtime-versions.json').read_text())['package_version']
-    if tag != 'v' + version:
+    normalized = '.'.join([match['major'], match['minor'], match['patch'] or '0'])
+    if prerelease:
+        normalized += '-' + prerelease
+    if normalized != version:
         raise ValueError(f'Tag {tag} does not match package version {version}')
     changelog = (root / 'CHANGELOG.md').read_text()
     headings = list(re.finditer(r'^##[ \t]+([^\s]+)[^\n]*$', changelog, re.MULTILINE))

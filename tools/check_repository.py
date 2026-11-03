@@ -14,7 +14,8 @@ def check(root=ROOT):
                 'THIRD_PARTY_NOTICES.md', 'install.sh', 'install.py', 'runtime-versions.json',
                 '.github/workflows/checks.yml', '.github/workflows/release.yml', 'tools/prepare_release.py', 'docs/architecture.md', 'docs/development.md',
                 'docs/benchmarking.md', 'docs/previews.md', 'docs/preview.html',
-                'docs/images/report-overview.png', 'docs/images/model-comparison.png']
+                'docs/images/report-overview.png', 'docs/images/model-comparison.png',
+                'docs/assets/vision-1.png', 'docs/assets/vision-2.png', 'docs/assets/vision-3.png']
     for name in required:
         assert (root / name).is_file(), 'Missing ' + name
     assert (root / 'install.sh').stat().st_mode & 0o111, 'install.sh must be executable'
